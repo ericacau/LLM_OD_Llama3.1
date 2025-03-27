@@ -1,0 +1,5 @@
+pyautogen==0.2.32
+networkx
+tqdm
+matplotlib
+numpy
