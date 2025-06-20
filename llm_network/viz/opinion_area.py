@@ -4,10 +4,11 @@ import json
 from collections import defaultdict
 import numpy as np
 from matplotlib import cm
+from .plot_config import  apply_plot_config
 
-if os.environ.get("DISPLAY", "") == "":
-    print("no display found. Using non-interactive Agg backend")
-    mpl.use("Agg")
+#if os.environ.get("DISPLAY", "") == "":
+#    print("no display found. Using non-interactive Agg backend")
+#    mpl.use("Agg")
 import matplotlib.pyplot as plt
 plt.rc('xtick',labelsize=14)
 plt.rc('ytick',labelsize=14)
@@ -55,7 +56,7 @@ class OpinionArea(object):
         for k, v in self.data.items():
             self.data[k] = [x / len(l["status"]) for x in self.data[k]]
 
-    def plot(self, filename=None, limit=None, legend=True):
+    def plot(self, filename=None, limit=None, legend=True, ax=None):
         """
         Generates the plot
 
@@ -76,23 +77,25 @@ class OpinionArea(object):
         data = [self.data[k][:limit] if limit else self.data[k] for k in categories]
         x = range(0, len(data[0]))
 
-        # Map numbers to a diverging color palette
-        colors = cm.coolwarm(np.linspace(0, 1, len(categories)))
+        # Map numbers to a diverging color palette (red to green)
+        colors = cm.get_cmap('RdYlGn')(np.linspace(0, 1, len(categories)))
 
-        plt.stackplot(x, data, labels=[label[k] for k in categories], colors=colors, alpha=0.7)
+        if ax is None:
+            fig, ax = plt.subplots()
 
-        plt.xlabel("Iterations", fontsize=14)
-        plt.ylabel("% Agents", fontsize=14)
-        plt.xticks(fontsize=20)
-        plt.yticks(fontsize=20)
-        plt.xlim(0,100)
-        plt.ylim(0,1)
+        ax.stackplot(x, data, labels=[label[k] for k in categories], colors=colors, alpha=0.7)
+        ax.set_xlabel("Iterations", fontsize=14)
+        ax.set_ylabel("% Agents", fontsize=14)
+        ax.set_xlim(0, 100)
+        ax.set_ylim(0, 1)
+
         if legend:
-            plt.legend(loc="best", fontsize=9, ncol=4, bbox_to_anchor=(1.01, 1.18))
+            ax.legend(loc="best", fontsize=9, ncol=4, bbox_to_anchor=(1.01, 1.18))
 
-        plt.tight_layout()
-        if filename is not None:
+        if filename is not None and ax is None:
+            apply_plot_config()
             plt.savefig(filename)
             plt.clf()
-        else:
+        elif ax is None:
+            apply_plot_config()
             plt.show()
