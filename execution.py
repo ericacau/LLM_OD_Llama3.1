@@ -15,28 +15,35 @@ def execute(
     theme_name="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
+    folder="",
 ):
     llm_config = {
         "config_list": None,
         "seed": 42,
-        "max_tokens": -1,  # max response length, -1 no limits. Imposing limits may lead to truncated responses
+        "max_tokens": -1,
         "temperature": 0.8,
     }
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(f"sample_data/reverse/reverse_agents_{exp_name}_{n_agents}_llama3.json")
+    
+    min_part = experiment.split('-')[1] 
+    data_folder = f"min{min_part.split('min')[1].replace('.', '')}" 
+
+    agent_file = f"sample_data/reverse_agents_{experiment}_{n_agents}_{models}.json"
+    net.add_agents(agent_file)
 
     if network is not None:
-        network = network.strip() # remove \r, returning errors
-        g = nx.read_edgelist(f"data/balanced/{network}", nodetype=str, delimiter=",")
+        network = network.strip()
+        network_path = f"data/{data_folder}/{network}"
+        g = nx.read_edgelist(network_path, nodetype=str, delimiter=",")
         g = nx.relabel_nodes(g, lambda x: x.strip())
         net.set_network(g)
 
-    # Create a dictionary with the instructions for each agent (not mandatory)
+    # Load instructions and opinion map
     instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
-    print(f"sample_data/agents_instructions_{theme_name}.json")
     opinion_map = json.load(open("sample_data/opinion_map.json"))
+
 
     # run the simulation
     sim = LLMOpinionSimulator(
@@ -54,7 +61,7 @@ def execute(
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/reverse/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
+        output_file=f"results/{data_folder}/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
 
 
@@ -71,7 +78,6 @@ if __name__ == "__main__":
         network = None
 
     model_list = models.split(",")
-
     config_list = {}
 
     # Create a configuration for each model
@@ -84,9 +90,12 @@ if __name__ == "__main__":
             "price": [0, 0],
         }
 
+    #identify current path for different minority classes
+    min_part = exp_name.split('-')[1] 
+    folder = f"min{min_part.split('min')[1].replace('.', '')}"  
+
     theme = json.load(open(f"themes/{theme_name}", "r"))
 
-    
     for n in range(run_n):
         execute(
             models=models,
@@ -97,4 +106,5 @@ if __name__ == "__main__":
             theme=theme,
             experiment=exp_name,
             n_agents=n_agents,
+            folder=folder
         )
