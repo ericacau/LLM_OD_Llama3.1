@@ -12,10 +12,13 @@
   agent_file = f"sample_data/reverse_agents_{experiment}_{n_agents}_llama3.json"
 - Results are stored into "results/minority_class/". This path contains both reverse and "base" experiments
 
-Base: 
- - Blue: minority class
- - Red: majority class
 
-Reverse: (paper fig 2)
+Reverse: 
+
+ - Blue: minority class -> negative opinion
+ - Red: majority class -> positive opinion
+
+Base:
+
  - Blue: majority class -> positive opinion
  - Red: minority class -> negative opinion
