@@ -28,10 +28,10 @@ def generate_unbalanced_agents(g=nx.Graph(),):
         agent = {"name": f"a{i[0]}"}
 
         if i[1]['class'] == 'red':
-            agent['status'] = 0
+            agent['status'] = 6
             agent["llm_name"] = "llama3.1"
         else:
-            agent['status'] = 6
+            agent['status'] = 0
             agent["llm_name"] = "llama3.1"
 
         res.append(agent)
@@ -40,12 +40,11 @@ def generate_unbalanced_agents(g=nx.Graph(),):
 
 
 if __name__ == "__main__":
-    input_folder = "/home/cau/mydata/LLM_OD_llama.3.1/data/min03"
-    output_folder = "/home/cau/mydata/LLM_OD_llama.3.1/sample_data"
+    input_folder = "/home/cau/mydata/LLM_OD_Llama3.1/data/balanced"
+    output_folder = "/home/cau/mydata/LLM_OD_Llama3.1/sample_data/reverse"
 
     for h_val in ['0.0', '0.5', '0.25', '0.75', '1.0']:
-        graphml_path = os.path.join(input_folder, f"PAH-min0.3-h{h_val}.graphml")
-        
+        graphml_path = os.path.join(input_folder, f"PAH-min0.5-h{h_val}.graphml")
         if not os.path.exists(graphml_path):
             print(f"File not found: {graphml_path}")
             continue
@@ -53,7 +52,7 @@ if __name__ == "__main__":
 
         agents = generate_unbalanced_agents(g=g)
         
-        output_path = os.path.join(output_folder, f"agents_PAH-min0.3-h{h_val}_100_llama3.json")
+        output_path = os.path.join(output_folder, f"reverse_agents_PAH-min0.5-h{h_val}_100_llama3.json")
         with open(output_path, "w") as f:
             json.dump(agents, f)
 

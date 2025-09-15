@@ -12,7 +12,7 @@ def execute(
     n,
     name,
     theme=None,
-    theme_name="theseus",
+    theme_name="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
 ):
@@ -25,16 +25,17 @@ def execute(
 
     # Create a network of agents from files
     net = llmn.Network()
-    net.add_agents(f"sample_data/agents_{exp_name}_{n_agents}_llama3.json")
+    net.add_agents(f"sample_data/reverse/reverse_agents_{exp_name}_{n_agents}_llama3.json")
 
     if network is not None:
-        network = network.strip()  # Remove any trailing whitespace including \r and \n
-        g = nx.read_edgelist(f"data/min03/{network}", nodetype=str, delimiter=",")
+        network = network.strip() # remove \r, returning errors
+        g = nx.read_edgelist(f"data/balanced/{network}", nodetype=str, delimiter=",")
         g = nx.relabel_nodes(g, lambda x: x.strip())
         net.set_network(g)
 
     # Create a dictionary with the instructions for each agent (not mandatory)
     instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
+    print(f"sample_data/agents_instructions_{theme_name}.json")
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
     # run the simulation
@@ -43,7 +44,7 @@ def execute(
         config_list,
         verbose=False,
         save_agents_debates=True,
-        monitor_type="Monitor", 
+        monitor_type="MonitorOpinionDistribution", 
         agents_instruction=instructions,
         opinion_map=opinion_map,
         min_opinion=0,
@@ -53,7 +54,7 @@ def execute(
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
+        output_file=f"results/reverse/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
 
 
