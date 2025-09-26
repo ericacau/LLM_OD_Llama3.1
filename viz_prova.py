@@ -1,35 +1,50 @@
-from llm_network.viz import OpinionTrends, StackedAreaChart
+from llm_network.viz import area_chart
 import os.path
 import matplotlib.pyplot as plt
+from collections import defaultdict
+from llm_network.viz.area_chart import StackedAreaChart
 
-h = ['0.0', '0.25', '0.5', '0.75', '1.0']
 
-# Create a figure and axes for subplots
-fig, axes = plt.subplots(1, len(h), figsize=(18 , 5), sharey=True)  
+# Create output directory
+os.makedirs("trends/area_chart", exist_ok=True)
 
+h_values = ['0.0', '0.25', '0.5', '0.75', '1.0']
 min_values = ['0.1', '0.3', '0.5']
 
 for min_val in min_values:
-    fig, axes = plt.subplots(1, len(h), figsize=(18, 5), sharey=True)
-    for idx, h_val in enumerate(h):
-        trends_filename = f"results/reverse/reverse_theseus_theseus_same_llama3.1_0_PAH-min{min_val}-h{h_val}.jsonl"
+    print(f"\nProcessing min_val = {min_val}")
+    fig, axes = plt.subplots(1, len(h_values), figsize=(18, 5), sharey=True)
+    
+    for idx, h_val in enumerate(h_values):
+        min_folder = f"min{min_val.replace('.', '')}"
+        trends_filename = f"results/{min_folder}/reverse_theseus_opinion_distr_theseus_same_llama3.1_0_PAH-min{min_val}-h{h_val}.jsonl"
         if os.path.exists(trends_filename):
             trends_img = StackedAreaChart(trends_filename)
-            axfigure = trends_img.plot_no_whitespace(ax=axes[idx])
-            axes[idx].set_title(f"h={h_val}", fontsize=14)
-            axes[idx].tick_params(axis='x', labelsize=14) 
-            axes[idx].tick_params(axis='y', labelsize=14) 
-            axes[idx].relim()
-            axes[idx].autoscale_view()
-            if idx == 0: 
-                axes[idx].set_ylabel("% Agents", fontsize=16)
-
+            lines = trends_img.plot(ax=axes[idx], limit=30)
+            
+            if lines:  # Only set title if we plotted something
+                axes[idx].set_title(f"h={h_val}", fontsize=14)
+                axes[idx].tick_params(axis='both', labelsize=12)
+                
+                if idx == 0:
+                    axes[idx].set_ylabel("% Agents", fontsize=14)
+            else:
+                print(f"No data plotted for {trends_filename}")
+        else:
+            print(f"File not found: {trends_filename}")
+            axes[idx].text(0.5, 0.5, 'No data', ha='center', va='center')
+    
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.05),
-               ncol=7, fontsize=14)
-    for ax in axes:
-        ax.legend().remove()
+    
+    # Add legend to the figure
+    if handles:  # Only add legend if we have plot elements
+        fig.legend(handles, labels, 
+                  loc='upper center', 
+                  bbox_to_anchor=(0.5, 1.05),
+                  ncol=7, fontsize=14)
 
+    
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.savefig(f"trends/opinion_trend/reverse_area_chart_combined_trends_llama3_min{min_val}.png", bbox_inches='tight', dpi=300)
+    output_file = f"trends/stacked/reverse_stacked_area_llama3_min{min_val}.png"
+    plt.savefig(output_file, bbox_inches='tight', dpi=300)
     plt.close(fig)
