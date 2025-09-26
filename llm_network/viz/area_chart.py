@@ -105,7 +105,7 @@ class StackedAreaChart:
         ax.set_ylim(0, 1)  # Exact bounds, no padding
         
         ax.set_ylabel("")
-        ax.legend(loc='upper left')
+        ax.legend([])
         
         # Remove ALL margins and padding
         ax.margins(0)

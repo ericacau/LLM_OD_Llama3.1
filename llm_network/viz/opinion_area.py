@@ -56,7 +56,7 @@ class OpinionArea(object):
         for k, v in self.data.items():
             self.data[k] = [x / len(l["status"]) for x in self.data[k]]
 
-    def plot(self, filename=None, limit=None, legend=True, ax=None):
+    def plot(self, filename=None, limit=None, legend=False, ax=None):
         """
         Generates the plot
 

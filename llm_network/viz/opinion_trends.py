@@ -24,9 +24,7 @@ class OpinionTrends(object):
         statuses = {}
         
         try:
-            with open(filename) as file:
-                print(f"Reading file: {filename}")  # Debug print
-                
+            with open(filename) as file:                
                 for id_row, l in enumerate(file):
                     try:
                         l = json.loads(l)
@@ -68,8 +66,8 @@ class OpinionTrends(object):
             ax = plt.gca()
             
         colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
-        labels = ['Opinion 0', 'Opinion 1', 'Opinion 2', 'Opinion 3', 
-                 'Opinion 4', 'Opinion 5', 'Opinion 6']
+        labels = ['Strongly disagree', 'Disagree', 'Mildly disagree', 'Neutral', 
+                  'Mildly agree', 'Agree', 'Strongly agree']
         
         if limit:
             x = self.x[:limit]

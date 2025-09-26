@@ -6,7 +6,7 @@ from llm_network.viz.area_chart import StackedAreaChart
 
 
 # Create output directory
-os.makedirs("trends/area_chart", exist_ok=True)
+os.makedirs("trends/stacked", exist_ok=True)
 
 h_values = ['0.0', '0.25', '0.5', '0.75', '1.0']
 min_values = ['0.1', '0.3', '0.5']
