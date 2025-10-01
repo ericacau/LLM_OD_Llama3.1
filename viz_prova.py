@@ -1,16 +1,14 @@
-from llm_network.viz import area_chart
 import os.path
 import matplotlib.pyplot as plt
 from collections import defaultdict
+from llm_network.viz.opinion_trends import OpinionTrends 
 from llm_network.viz.area_chart import StackedAreaChart
-from llm_network.viz.opinion_volume import OpinionVolume
 
 # Create output directory
-os.makedirs("trends/opinion_volume", exist_ok=True)
+os.makedirs("trends/stacked", exist_ok=True)
 
 h_values = ['0.0', '0.25', '0.5', '0.75', '1.0']
 min_values = ['0.1', '0.3', '0.5']
-
 
 for min_val in min_values:
     print(f"\nProcessing min_val = {min_val}")
@@ -18,10 +16,10 @@ for min_val in min_values:
     
     for idx, h_val in enumerate(h_values):
         min_folder = f"min{min_val.replace('.', '')}"
-        trends_filename = f"results/{min_folder}/reverse_theseus_opinion_distr_theseus_same_llama3.1_0_PAH-min{min_val}-h{h_val}.jsonl"
+        trends_filename = f"results/{min_folder}/theseus_opinion_distr_theseus_same_llama3.1_0_PAH-min{min_val}-h{h_val}.jsonl"
         
         if os.path.exists(trends_filename):
-            trends_img = OpinionVolume(trends_filename)
+            trends_img = StackedAreaChart(trends_filename)
             lines = trends_img.plot(ax=axes[idx], limit=30)
             
             axes[idx].set_title(f"h={h_val}", fontsize=14)
@@ -44,6 +42,6 @@ for min_val in min_values:
                   ncol=7, fontsize=14)
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    output_file = f"trends/opinion_volume/reverse_opinion_volume_llama3_min{min_val}.png"
+    output_file = f"trends/stacked/opinion_volume_llama3_min{min_val}.png"
     plt.savefig(output_file, bbox_inches='tight', dpi=300)
     plt.close(fig)
