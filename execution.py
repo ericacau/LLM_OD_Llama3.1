@@ -30,8 +30,8 @@ def execute(
     
     min_part = experiment.split('-')[1] 
     data_folder = f"min{min_part.split('min')[1].replace('.', '')}" 
-
-    agent_file = f"sample_data/reverse_agents_{experiment}_{n_agents}_{models}.json"
+   
+    agent_file = f"sample_data/reverse_agents_{experiment}_{n_agents}_{model}.json"
     net.add_agents(agent_file)
 
     if network is not None:
