@@ -3,6 +3,7 @@ import llm_network as llmn
 import networkx as nx
 import json
 import sys
+import os
 
 
 def execute(
@@ -15,12 +16,12 @@ def execute(
     theme_name="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
-    folder="",
+    folder=''
 ):
     llm_config = {
         "config_list": None,
         "seed": 42,
-        "max_tokens": -1,
+        "max_tokens": 8192,
         "temperature": 0.8,
     }
 
@@ -58,10 +59,12 @@ def execute(
         max_opinion=6,
     )
     sim.set_agents(net)
+    
+    os.makedirs("results", exist_ok=True)
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{data_folder}/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
+        output_file=f"results/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
 
 
@@ -85,7 +88,7 @@ if __name__ == "__main__":
         config_list[model] = {
             "model": f"{model}",
             "base_url": "http://127.0.0.1:11434/v1", # "http://edge-nd1.isti.cnr.it:11434/v1",
-            "api_type": "open_ai",
+            "api_type": "openai",
             "api_key": "NULL",
             "price": [0, 0],
         }
