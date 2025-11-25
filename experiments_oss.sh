@@ -3,7 +3,7 @@
 # parameters: model, num_run, theme_name, experiment, number of agents, network
 
 # gptoss on all minority classes and homophily values (100 agents, 1 iteration)
-python execution.py gpt-oss 1 theseus_same.json PAH-min0.5-h0.0 100 PAH-min0.5-h0.0.csv
+python execution.py gptoss 1 theseus_same.json PAH-min0.5-h0.0 100 PAH-min0.5-h0.0.csv
 echo "PAH-min0.5-h0.0 done" > log_oss.txt
 python execution.py gptoss 1 theseus_same.json PAH-min0.5-h0.5 100 PAH-min0.5-h0.5.csv
 echo "PAH-min0.5-h0.5 done" > log_oss.txt
