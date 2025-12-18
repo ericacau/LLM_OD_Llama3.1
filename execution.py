@@ -31,7 +31,7 @@ def execute(
     min_part = experiment.split('-')[1] 
     data_folder = f"min{min_part.split('min')[1].replace('.', '')}" 
    
-    agent_file = f"sample_data/reverse_agents_{experiment}_{n_agents}_{model}.json"
+    agent_file = f"sample_data/agents_{experiment}_{n_agents}_{model}.json"
     net.add_agents(agent_file)
 
     if network is not None:
@@ -64,7 +64,7 @@ def execute(
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/reverse_{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
+        output_file=f"results/{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
     )
 
 

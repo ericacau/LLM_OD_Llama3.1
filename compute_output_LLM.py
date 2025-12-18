@@ -58,6 +58,4 @@ def compute_transitions(outpath='statistical_validation/results'):
             np.save(f'{outpath}/{minority_size}/{homophily_rate}/transition_matrix_real.npy', run_transition_matrix)
 
 
-
-
 compute_transitions()
