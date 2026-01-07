@@ -27,11 +27,11 @@ def execute(
 
     # Create a network of agents from files
     net = llmn.Network()
-    
     min_part = experiment.split('-')[1] 
     data_folder = f"min{min_part.split('min')[1].replace('.', '')}" 
-   
-    agent_file = f"sample_data/agents_{experiment}_{n_agents}_{model}.json"
+    model_name = models.replace(":", "")
+    agent_file = f"sample_data/agents_{experiment}_{n_agents}_{model_name}.json"
+    print(agent_file)
     net.add_agents(agent_file)
 
     if network is not None:
@@ -64,7 +64,7 @@ def execute(
     sim.run(
         n_iterations=100,
         themes=theme,
-        output_file=f"results/{theme_name}_{name.split('.')[0]}_{models}_{n}_{experiment}.jsonl",
+        output_file=f"results/{theme_name}_{name.split('.')[0]}_{model_name}_{n}_{experiment}.jsonl",
     )
 
 
