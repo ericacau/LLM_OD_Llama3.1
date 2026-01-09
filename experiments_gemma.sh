@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # parameters: model, num_run, theme_name, experiment, number of agents, network
 
