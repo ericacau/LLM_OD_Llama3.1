@@ -16,6 +16,7 @@ class LLMOpinionSimulator(object):
         opinion_map: dict = None,
         min_opinion: int = 1,
         max_opinion: int = 10,
+        **kwargs,
     ):
         """
         LLM Opinion Simulator
@@ -38,6 +39,7 @@ class LLMOpinionSimulator(object):
             opinion_map=opinion_map,
             min_opinion=min_opinion,
             max_opinion=max_opinion,
+            **kwargs,
         )
         self.statuses = {}
         self.llm_config = llm_config

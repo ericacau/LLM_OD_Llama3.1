@@ -164,10 +164,7 @@ class Agents(object):
 
         :return: an Agent object
         """
-        n_agents = len(self.agents)
-        ag = np.random.randint(0, n_agents)
-
-        return self.agents[f"a{ag}"]
+        return np.random.choice(list(self.agents.values()))
 
     def agents_iter(self) -> (str, Agent):
         """

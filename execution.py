@@ -16,7 +16,11 @@ def execute(
     theme_name="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
-    folder=''
+    folder='',
+    use_vllm=False,
+    vllm_url=None,
+    vllm_mode="server",
+    n_iterations=100,
 ):
     llm_config = {
         "config_list": None,
@@ -45,6 +49,7 @@ def execute(
     instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
+    monitor_type = "MonitorOpinionDistributionVLLM" if use_vllm else "MonitorOpinionDistribution"
 
     # run the simulation
     sim = LLMOpinionSimulator(
@@ -52,33 +57,46 @@ def execute(
         config_list,
         verbose=False,
         save_agents_debates=True,
-        monitor_type="MonitorOpinionDistribution", 
+        monitor_type=monitor_type, 
         agents_instruction=instructions,
         opinion_map=opinion_map,
         min_opinion=0,
         max_opinion=6,
+        vllm_url=vllm_url,
+        vllm_mode=vllm_mode,
     )
     sim.set_agents(net)
     
     os.makedirs("results", exist_ok=True)
     sim.run(
-        n_iterations=100,
+        n_iterations=n_iterations,
         themes=theme,
         output_file=f"results/{theme_name}_{name.split('.')[0]}_{model_name}_{n}_{experiment}.jsonl",
     )
 
 
 if __name__ == "__main__":
-    # Simple example
-    models = sys.argv[1]
-    run_n = int(sys.argv[2])
-    theme_name = sys.argv[3]
-    exp_name = sys.argv[4]
-    n_agents = int(sys.argv[5])
-    try:
-        network = sys.argv[6]
-    except IndexError:
-        network = None
+    import argparse
+    parser = argparse.ArgumentParser(description="LLM Opinion Simulator Execution script")
+    parser.add_argument("models", type=str, help="Comma-separated list of models to use")
+    parser.add_argument("run_n", type=int, help="Number of runs")
+    parser.add_argument("theme_name", type=str, help="Theme JSON file name")
+    parser.add_argument("exp_name", type=str, help="Experiment name")
+    parser.add_argument("n_agents", type=int, help="Number of agents")
+    parser.add_argument("network", type=str, nargs="?", default=None, help="Optional network file path")
+    parser.add_argument("--vllm", action="store_true", help="Use batched vLLM backend")
+    parser.add_argument("--vllm-url", type=str, default="http://localhost:8000/v1", help="vLLM server API base URL")
+    parser.add_argument("--vllm-mode", type=str, default="server", choices=["server", "offline"], help="vLLM batching mode")
+    parser.add_argument("-i", "--iterations", type=int, default=100, help="Number of simulation iterations")
+
+    args = parser.parse_args()
+
+    models = args.models
+    run_n = args.run_n
+    theme_name = args.theme_name
+    exp_name = args.exp_name
+    n_agents = args.n_agents
+    network = args.network
 
     model_list = models.split(",")
     config_list = {}
@@ -90,7 +108,6 @@ if __name__ == "__main__":
             "base_url": "http://localhost:11434/v1",
             "api_type": "openai",
             "api_key": "NULL",
-            "price": [0, 0],
         }
 
     #identify current path for different minority classes
@@ -109,5 +126,9 @@ if __name__ == "__main__":
             theme=theme,
             experiment=exp_name,
             n_agents=n_agents,
-            folder=folder
+            folder=folder,
+            use_vllm=args.vllm,
+            vllm_url=args.vllm_url,
+            vllm_mode=args.vllm_mode,
+            n_iterations=args.iterations,
         )
