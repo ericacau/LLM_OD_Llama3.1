@@ -4,6 +4,83 @@ import networkx as nx
 import json
 import sys
 import os
+import copy
+import warnings
+from autogen import ConversableAgent
+from autogen.code_utils import model_dump
+
+
+# Monkeypatch autogen ConversableAgent to force strict role alternation (user/assistant)
+# starting with 'user' for strict OpenAI-compatible API servers (like vLLM).
+original_generate_oai_reply_from_client = ConversableAgent._generate_oai_reply_from_client
+
+def patched_generate_oai_reply_from_client(self, llm_client, messages, cache):
+    copied_messages = copy.deepcopy(messages)
+    all_messages = []
+    for message in copied_messages:
+        tool_responses = message.get("tool_responses", [])
+        if tool_responses:
+            all_messages += tool_responses
+            if message.get("role") != "tool":
+                all_messages.append({key: message[key] for key in message if key != "tool_responses"})
+        else:
+            all_messages.append(message)
+            
+    system_msgs = [m for m in all_messages if m.get("role") == "system"]
+    other_msgs = [m for m in all_messages if m.get("role") != "system"]
+    
+    if other_msgs:
+        # Force first non-system message to be 'user'
+        if other_msgs[0].get("role") == "assistant":
+            other_msgs[0]["role"] = "user"
+            
+        # Merge consecutive messages with identical roles
+        alternated_msgs = []
+        last_role = None
+        for m in other_msgs:
+            role = m.get("role")
+            if role == last_role:
+                if alternated_msgs:
+                    alternated_msgs[-1]["content"] = (
+                        str(alternated_msgs[-1].get("content", "")) + "\n\n" + str(m.get("content", ""))
+                    )
+            else:
+                alternated_msgs.append(m)
+                last_role = role
+                
+        # Force last message to be 'user' (cannot end with 'assistant' when querying API)
+        if alternated_msgs and alternated_msgs[-1].get("role") == "assistant":
+            alternated_msgs[-1]["role"] = "user"
+            
+        all_messages = system_msgs + alternated_msgs
+
+    # Directly execute the client request with cleaned messages list
+    response = llm_client.create(
+        context=all_messages[-1].pop("context", None) if all_messages else None,
+        messages=all_messages,
+        cache=cache,
+    )
+    extracted_response = llm_client.extract_text_or_completion_object(response)[0]
+
+    if extracted_response is None:
+        warnings.warn(f"Extracted_response from {response} is None.", UserWarning)
+        return None
+    if not isinstance(extracted_response, str) and hasattr(extracted_response, "model_dump"):
+        extracted_response = model_dump(extracted_response)
+    if isinstance(extracted_response, dict):
+        if extracted_response.get("function_call"):
+            extracted_response["function_call"]["name"] = self._normalize_name(
+                extracted_response["function_call"]["name"]
+            )
+        for tool_call in extracted_response.get("tool_calls") or []:
+            tool_call["function"]["name"] = self._normalize_name(tool_call["function"]["name"])
+            if tool_call.get("id") is None:
+                tool_call.pop("id")
+            if tool_call.get("type") is None:
+                tool_call.pop("type")
+    return extracted_response
+
+ConversableAgent._generate_oai_reply_from_client = patched_generate_oai_reply_from_client
 
 
 def execute(
