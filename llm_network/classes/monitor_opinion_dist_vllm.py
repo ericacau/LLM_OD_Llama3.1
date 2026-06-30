@@ -224,8 +224,7 @@ class MonitorOpinionDistributionVLLM(MonitorOpinionDistribution):
 
             messages_r2 = [
                 {"role": "system", "content": u1_instruction},
-                {"role": "assistant", "content": f' What do you think of the following statement?: "{theme}" '},
-                {"role": "user", "content": text1_opponent}
+                {"role": "user", "content": f'Opponent ({opponent.name}) statement: "{text1_opponent}"\n\nWhat is your stance on the statement: "{theme}"?'}
             ]
 
             req_item = {
