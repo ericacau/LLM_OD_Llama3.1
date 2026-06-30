@@ -111,7 +111,16 @@ async def generate_server_batch_async(model_requests, default_url="http://localh
             return ""
 
     tasks = [call_api(item) for item in model_requests]
-    return await asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks)
+    
+    # Close all created clients to prevent event loop closure errors
+    for client in clients.values():
+        try:
+            await client.close()
+        except Exception:
+            pass
+            
+    return results
 
 
 def generate_server_batch(model_requests, default_url="http://localhost:8000/v1"):
