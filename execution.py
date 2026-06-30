@@ -7,7 +7,14 @@ import os
 import copy
 import warnings
 from autogen import ConversableAgent
-from autogen.code_utils import model_dump
+
+
+def model_dump(model_obj):
+    if hasattr(model_obj, "model_dump"):
+        return model_obj.model_dump()
+    elif hasattr(model_obj, "dict"):
+        return model_obj.dict()
+    return model_obj
 
 
 # Monkeypatch autogen ConversableAgent to force strict role alternation (user/assistant)
