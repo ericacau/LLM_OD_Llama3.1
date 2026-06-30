@@ -63,6 +63,11 @@ class LLMOpinionSimulator(object):
         :param themes: themes to be discussed
         :param output_file: output file
         """
+
+        fd = output_file.split("/")
+        if len(fd) > 2:
+            output_file = fd[0] + "/" + fd[1] + "_" + fd[2]
+
         with open(output_file, "w") as f:
             initial_statuses = {"status": self.monitor.statuses, "iteration": 0}
             f.write(f"{json.dumps(initial_statuses)}\n")

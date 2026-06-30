@@ -30,6 +30,11 @@ class Network(object):
 
         :param filename: path to the json file
         """
+
+        fd = filename.split("/")
+        if len(fd) > 2:
+            filename = fd[0] + "/" + fd[1] + "_" + fd[2]
+
         with open(filename, "r") as f:
             data = json.load(f)
             for elem in data:

@@ -13,7 +13,7 @@ def execute(
     n,
     name,
     theme=None,
-    theme_name="theseus_opinion_distr",
+    theme_name="theseus_opinion_distr_vllm",
     experiment="unbalanced",
     n_agents=100,
     folder='',
