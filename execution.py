@@ -105,7 +105,7 @@ if __name__ == "__main__":
     for model in model_list:
         config_list[model] = {
             "model": f"{model}",
-            "base_url": "http://localhost:11434/v1",
+            "base_url": args.vllm_url if args.vllm_url else "http://localhost:11434/v1",
             "api_type": "openai",
             "api_key": "NULL",
         }
