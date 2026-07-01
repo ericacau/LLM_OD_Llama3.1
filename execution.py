@@ -97,7 +97,7 @@ def execute(
     n,
     name,
     theme=None,
-    theme_name="theseus_opinion_distr_vllm",
+    theme_name="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
     folder='',
@@ -115,8 +115,12 @@ def execute(
 
     # Create a network of agents from files
     net = llmn.Network()
-    min_part = experiment.split('-')[1] 
-    data_folder = f"min{min_part.split('min')[1].replace('.', '')}" 
+    if network is not None:
+        network_name = os.path.basename(network.strip())
+        min_part = network_name.split('-')[1]
+    else:
+        min_part = experiment.split('-')[1]
+    data_folder = f"min{min_part.split('min')[1].replace('.', '')}"
     model_name = models.replace(":", "")
     agent_file = f"sample_data/agents_{experiment}_{n_agents}_{model_name}.json"
     print(agent_file)
@@ -124,7 +128,7 @@ def execute(
 
     if network is not None:
         network = network.strip()
-        network_path = f"data/{data_folder}/{network}"
+        network_path = f"./data/{data_folder}/{network}"
         g = nx.read_edgelist(network_path, nodetype=str, delimiter=",")
         g = nx.relabel_nodes(g, lambda x: x.strip())
         net.set_network(g)

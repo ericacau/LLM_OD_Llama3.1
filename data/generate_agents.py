@@ -29,10 +29,10 @@ def generate_unbalanced_agents(g=nx.Graph(),):
 
         if i[1]['class'] == 'blue':
             agent['status'] = 6
-            agent["llm_name"] = "gemma3:4b"
+            agent["llm_name"] = "meta-llama/Llama-3.2-3B-Instruct"
         else:
             agent['status'] = 0
-            agent["llm_name"] = "gemma3:4b"
+            agent["llm_name"] = "meta-llama/Llama-3.2-3B-Instruct"
 
         res.append(agent)
 
@@ -42,9 +42,10 @@ if __name__ == "__main__":
     print("working")
     for min in ["0.1", "0.3", "0.5"]:
         for h_val in ['0.0', '0.5', '0.25', '0.75', '1.0']:
-            g = nx.read_graphml(f"./data/graphs/PAH-min{min}-h{h_val}.graphml")
+            g = nx.read_graphml(f"./graphs/PAH-min{min}-h{h_val}.graphml")
             agents = generate_unbalanced_agents(g=g)
-            json.dump(agents, open(f"./sample_data/agents_PAH-min{min}-h{h_val}_100_gemma34b.json", "w"))
+            json.dump(agents, open(f"../sample_data/reverse_agents_PAH-min{min}-h{h_val}_100_meta-llama_Llama-3.2-3B-Instruct.json", "w"))
+
 
     
 
