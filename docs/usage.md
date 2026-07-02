@@ -82,6 +82,13 @@ python execution.py <models> <run_n> <theme_name> <exp_name> <n_agents> [<networ
 *   **Description**: The number of simulation iteration steps to execute per run.
 *   **Details**: Controls how many iterations are run before writing the final states. A single iteration runs a debate interaction for every agent in the network.
 
+#### `--monitor`
+*   **Type**: `string` (default: `MonitorOpinionDistribution`, choices: `['Monitor', 'MonitorOpinionDistribution']`)
+*   **Description**: The class structure defining how debates, arguments, and opinion shifts are processed.
+    - `MonitorOpinionDistribution`: Includes neighborhood opinion distribution values in agents' templates.
+    - `Monitor`: The base Monitor class using simple opinion maps (no neighborhood distribution statistics).
+*   **Note**: When `--vllm` is enabled, the CLI automatically maps `Monitor` to its batched equivalent `MonitorVLLM`, and `MonitorOpinionDistribution` to `MonitorOpinionDistributionVLLM`.
+
 ---
 
 ## Detailed Configuration Matrix

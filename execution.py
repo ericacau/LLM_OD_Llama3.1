@@ -105,6 +105,7 @@ def execute(
     vllm_url=None,
     vllm_mode="server",
     n_iterations=100,
+    monitor_type="MonitorOpinionDistribution",
 ):
     llm_config = {
         "config_list": None,
@@ -133,7 +134,12 @@ def execute(
     instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
-    monitor_type = "MonitorOpinionDistributionVLLM" if use_vllm else "MonitorOpinionDistribution"
+    if use_vllm:
+        monitor_map = {
+            "Monitor": "MonitorVLLM",
+            "MonitorOpinionDistribution": "MonitorOpinionDistributionVLLM"
+        }
+        monitor_type = monitor_map.get(monitor_type, monitor_type + "VLLM")
 
     # run the simulation
     sim = LLMOpinionSimulator(
@@ -172,6 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("--vllm-url", type=str, default="http://localhost:8000/v1", help="vLLM server API base URL")
     parser.add_argument("--vllm-mode", type=str, default="server", choices=["server", "offline"], help="vLLM batching mode")
     parser.add_argument("-i", "--iterations", type=int, default=100, help="Number of simulation iterations")
+    parser.add_argument("--monitor", type=str, default="MonitorOpinionDistribution", choices=["Monitor", "MonitorOpinionDistribution"], help="Monitor type to use")
 
     args = parser.parse_args()
 
@@ -215,4 +222,5 @@ if __name__ == "__main__":
             vllm_url=args.vllm_url,
             vllm_mode=args.vllm_mode,
             n_iterations=args.iterations,
+            monitor_type=args.monitor,
         )
