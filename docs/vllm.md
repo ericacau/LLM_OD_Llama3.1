@@ -24,6 +24,10 @@ By enabling `--vllm`, we restructure the simulation loop:
 4. **Round 3 (Opponents)**: Finally, all $N$ opponent reactions are sent concurrently.
 5. All opinions are updated and saved together at the end of the iteration step.
 
+This parallel batching architecture is implemented across both supported monitors:
+*   `MonitorOpinionDistributionVLLM` (selected when running `--monitor MonitorOpinionDistribution` with `--vllm`)
+*   `MonitorVLLM` (selected when running `--monitor Monitor` with `--vllm`)
+
 Since vLLM/Ollama processes concurrent requests in parallel (using continuous batching and page attention), this reduces the total runtime to just **a few minutes** (speedup of over **100x**).
 
 ---
