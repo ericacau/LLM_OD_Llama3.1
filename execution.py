@@ -97,7 +97,7 @@ def execute(
     n,
     name,
     theme=None,
-    theme_name="theseus_opinion_distr",
+    prompt_type="theseus_opinion_distr",
     experiment="unbalanced",
     n_agents=100,
     folder='',
@@ -135,7 +135,8 @@ def execute(
         net.set_network(g)
 
     # Load instructions and opinion map
-    instructions = json.load(open(f"sample_data/agents_instructions_{theme_name}.json"))
+    instructions_path = f"sample_data/agents_instructions_{prompt_type}.json"
+    instructions = json.load(open(instructions_path))
     opinion_map = json.load(open("sample_data/opinion_map.json"))
 
     if use_vllm:
@@ -165,7 +166,7 @@ def execute(
     sim.run(
         n_iterations=n_iterations,
         themes=theme,
-        output_file=f"results/{theme_name}_{name.split('.')[0]}_{model_name}_{n}_{experiment}.jsonl",
+        output_file=f"results/{prompt_type}_{name.split('.')[0]}_{model_name}_{n}_{experiment}.jsonl",
     )
 
 
@@ -178,6 +179,7 @@ if __name__ == "__main__":
     parser.add_argument("exp_name", type=str, help="Experiment name")
     parser.add_argument("n_agents", type=int, help="Number of agents")
     parser.add_argument("network", type=str, nargs="?", default=None, help="Optional network file path")
+    parser.add_argument("--prompt-type", type=str, default="theseus_opinion_distr", choices=["theseus", "theseus_opinion_distr"], help="Prompt/instructions type to use")
     parser.add_argument("--vllm", action="store_true", help="Use batched vLLM backend")
     parser.add_argument("--vllm-url", type=str, default="http://localhost:8000/v1", help="vLLM server API base URL")
     parser.add_argument("--vllm-mode", type=str, default="server", choices=["server", "offline"], help="vLLM batching mode")
@@ -219,6 +221,7 @@ if __name__ == "__main__":
             n=n,
             name=theme_name,
             theme=theme,
+            prompt_type=args.prompt_type,
             experiment=exp_name,
             n_agents=n_agents,
             folder=folder,
