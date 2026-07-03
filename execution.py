@@ -4,6 +4,9 @@ import networkx as nx
 import json
 import sys
 import os
+import logging
+
+logging.getLogger("autogen.oai.client").setLevel(logging.ERROR)
 import copy
 import warnings
 from autogen import ConversableAgent
